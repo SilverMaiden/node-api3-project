@@ -56,12 +56,32 @@ router.get('/:id', validateUserId, (req, res) => {
     res.status(200).json(req.user);
 })
 
+//Get posts for specific user using user id
+
+router.get('/:id/posts', validateUserId, (req, res) => {
+    userData.getUserPosts(req.user.id)
+    .then(response => {
+        res.status(200).json(response);
+    }).catch(error => {
+        res.status(500).json({message: `Failed to get posts for user id ${req.user.id}`})
+    })
+})
+
 router.put('/:id', validateUserId, validateUser, (req, res) => {
     userData.update(req.user.id, req.body)
     .then(response => {
         res.status(200).json(response);
     }).catch(error => {
         res.status(500).json({message: "Failed to update user"})
+    })
+})
+
+router.delete('/:id', validateUserId, (req, res) => {
+    userData.remove(req.user.id)
+    .then(response => {
+        res.status(200).json(response);
+    }).catch(error => {
+        res.status(500).json({message: "Failed to remove user."})
     })
 })
 
