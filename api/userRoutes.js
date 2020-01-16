@@ -8,14 +8,26 @@ const router = express.Router();
 router.use(express.json());
 const userData = require("../users/userDb.js");
 
-const validate = (req, res, next) => {
-    if ( req.body === undefined ) {
+const validateUser = (req, res, next) => {
+    if (req.body === undefined) {
         res.status(400).json({ message: `missing user data` })
     } else if (req.body.name === undefined || req.body.name.length === 0) {
         res.status(400).json({ message: "missing required name field" })
     } else {
         next()
     }
+}
+
+const validateUserId = (req, res, next) => {
+    userData.getById(req.params.id)
+    .then(response => {
+        if (response !== undefined) {
+            req.user = response;
+            next()
+        } else {
+            res.status(400).json({message: "invalid user id"})
+        }
+    })
 }
 
 router.get('/', (req, res) => {
@@ -27,7 +39,12 @@ router.get('/', (req, res) => {
     })
 })
 
-router.post('/', validate, (req, res) => {
+
+router.get('/:id', validateUserId, (req, res) => {
+    res.status(200).json(req.user);
+})
+
+router.post('/', validateUser, (req, res) => {
     userData.insert(req.body)
     .then(response => {
         res.status(201).json(response)
