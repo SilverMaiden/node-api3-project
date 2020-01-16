@@ -40,10 +40,6 @@ router.get('/', (req, res) => {
 })
 
 
-router.get('/:id', validateUserId, (req, res) => {
-    res.status(200).json(req.user);
-})
-
 router.post('/', validateUser, (req, res) => {
     userData.insert(req.body)
     .then(response => {
@@ -52,6 +48,21 @@ router.post('/', validateUser, (req, res) => {
         res.status(500).json({error: "Failed to add user."});
     })
 
+})
+// BY ID
+//
+
+router.get('/:id', validateUserId, (req, res) => {
+    res.status(200).json(req.user);
+})
+
+router.put('/:id', validateUserId, validateUser, (req, res) => {
+    userData.update(req.user.id, req.body)
+    .then(response => {
+        res.status(200).json(response);
+    }).catch(error => {
+        res.status(500).json({message: "Failed to update user"})
+    })
 })
 
 module.exports = router;
